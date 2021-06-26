@@ -3,24 +3,24 @@ body{
 }
 .title{
     position: absolute;
-    width: 937px;
+    width: 623px;
     height: 45px;
-    left: 256px;
-    top: 29px;
+    left: 423px;
+    top: 0px;
 }
 .input-1{
     position: absolute;
     width: 427px;
     height: 143px;
-    left: 84px;
-    top: 159px;
+    left: 168px;
+    top: 89px;
 }
 .left-1{
     position: absolute;
     width: 290px;
     height: 143px;
 }
-.N{
+.R{
     position: absolute;
     width: 106px;
     height: 28px;
@@ -36,7 +36,7 @@ body{
 
     color: #E5E5E5;
 }
-.W{
+.P{
     position: absolute;
     width: 102px;
     height: 28px;
@@ -61,10 +61,10 @@ body{
     border: 1px solid #FFAFB4;
     box-sizing: border-box;
 }
-.-N{
+.-R{
     left: 35px;
 }
-.-W{
+.-P{
     right: 35px;
 }
 .right-1{
@@ -260,13 +260,15 @@ body{
     width: 29px;
     height: 29px;
 }
+.inputT{
+    width: 412.72px;
+    height: 400px;
+}
 
-.inputT.value{
+.inputT.max{
     position: absolute;
-    width: 520px;
-    height: 142px;
-    left: 84px;
-    top: 288px;
+    left: 29px;
+    top: 337px;
 }
 .text{
     font-family: Roboto;
@@ -279,19 +281,19 @@ body{
 
     color: #DD6B6B;
 }
-.text.value{
+.text.max{
     position: absolute;
-    width: 61px;
-    height: 28px;
+    width: 80px;
+    height: 32px;
 
 }
 .rtg{
     text-align: center;
 }
-.rtg.value{
+.rtg.max{
     position: absolute;
-    width: 520px;
-    height: 107px;
+    width: 412.72px;
+    height: 400px;
     top: 45px;
     overflow: hidden;
 
@@ -299,25 +301,72 @@ body{
     box-sizing: border-box;
 }
 
-.inputT.weight{
+.inputT.allocation{
     position: absolute;
-    width: 520px;
-    height: 144px;
-    left: 84px;
-    top: 450px;
+    left: 502px;
+    top: 337px;
+
 }
-.text.weight{
+.text.allocation{
     position: absolute;
     width: 75px;
     height: 28px;
 }
-.rtg.weight{
+.rtg.allocation{
     /* Rectangle 4 */
 
     position: absolute;
-    width: 520px;
-    height: 107px;
+    width: 411.68px;
+    height: 400px;
     top: 45px;
+    overflow: hidden;
+
+    border: 2px solid #DD6B6B;
+    box-sizing: border-box;
+}
+.inputT.need{
+    position: absolute;
+    left: 974px;
+    top: 337px;
+
+}
+.text.need{
+    position: absolute;
+    width: 75px;
+    height: 28px;
+}
+.rtg.need{
+    /* Rectangle 4 */
+
+    position: absolute;
+    width: 411.68px;
+    height: 400px;
+    top: 45px;
+    overflow: hidden;
+
+    border: 2px solid #DD6B6B;
+    box-sizing: border-box;
+}
+.inputT.available{
+    position: absolute;
+    width: 424px;
+    height: 138px;
+    left: 29px;
+    top: 194px;
+
+}
+.text.available{
+    position: absolute;
+    width: 110px;
+    height: 42px;
+}
+.rtg.available{
+    /* Rectangle 4 */
+
+    position: absolute;
+    width: 424px;
+    height: 100px;
+    top: 37px;
     overflow: hidden;
 
     border: 2px solid #DD6B6B;
@@ -361,10 +410,11 @@ body{
 
     position: absolute;
     display: flex;
-    width: 794px;
-    height: 90px;
-    left: 617px;
-    top: 699px;
+    flex-direction: column;
+    width: 775px;
+    height: 87px;
+    left: 611px;
+    top: 222px;
 
     text-align: center;
     justify-content: center;
@@ -373,19 +423,20 @@ body{
 
     color: #CFC089;
 }
-.result-text{
-    position: absolute;
+.result p{
     width: 794px;
     height: 90px;
     font-family: Roboto;
     font-style: normal;
     font-weight: 500;
-    font-size: 64px;
+    font-size: 36px;
     line-height: 75px;
 }
 .output.result small{
+    width: 100%;
     position: absolute;
     bottom: 0;
+
 }
 .tbl{
     flex-shrink: 0;

@@ -3,8 +3,9 @@ $(document).on('input', '.input-status', function() {
 });
 
 $('.back').on( 'click', () => {
-    if(tracer.pivot==0) return;
+    if(tracer.pivot==1) return;
     changeStatus(-1);
+
 });
 
 $('.forward').on('click', () => {
@@ -13,23 +14,25 @@ $('.forward').on('click', () => {
 });
 
 $('.btn.generate-input').click(() => {
+    getAvail();
     clear();
 });
 
 $('.btn.generate').click(() => {
+    getAvail();
+    getValue();
     clear();
-    knapsack(0, 0);
-
+    banker();
 });
 
 $('.play').on('click', () => {
     if(!play) {
         clearInterval(tracer.interval);
-        $('.play span').text('Play');
+        $('.play').html('Play');
         play = !play;
     }
     else {
-        $('.play span').text('Pause');
+        $('.play').html('Pause');
         play = !play;
         tracer.renderTracer();
     }
@@ -49,11 +52,12 @@ function changeStatus(changed= 0){
     var val = $('.input-status').val()*1 + changed;
     $('.input-status').val(val);
     var width = val / max * 100;
-
-    $('.status-value').html( (val+1) + '/' + (max *1 +1) );
-    $('.input-status').css('background', `linear-gradient(270deg, #666666 ${100-width}%, #FFED50 0%)`);
+    $('.status-value').html( (val) + '/' + (max *1) );
+    $('.input-status').css('background', `linear-gradient(270deg, #263238 ${100-width}%, #FFED50 0%)`);
     tracer.pivot = val;
-    tracer.displayCurrent(tracer.hmtlTrace[tracer.pivot]);
+    tracer.displayCurrent(tracer.hmtlTrace[val]);
+    play = true;
+    $('.play').html('Play');
 }
 
 

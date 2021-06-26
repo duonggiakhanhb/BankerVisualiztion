@@ -1,35 +1,75 @@
 
 var MAXTIME = Number.MAX_VALUE;
-var val = [1, 4, 5, 7];
-var wt = [1, 3, 4, 5];
-var W = 7;
-var N = 4;
+var P = 5;
+var R = 3;
+var avail = [3, 3, 2];
+var max = [
+    [7, 5, 3],
+    [3, 2, 2],
+    [9, 0, 2],
+    [2, 2, 2],
+    [4, 3, 3]
+];
+var allocation = [
+    [0, 1, 0],
+    [2, 0, 0],
+    [3, 0, 2],
+    [2, 1, 1],
+    [0, 0, 2]
+];
+var need = new Array (P);
+
 var tracer = new Tracer();
 var play = true;
+var ABC = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 
 // creating all cells
-function createMatrix(){
+function createMatrix(label, arr){
     // get the reference for the body
-    var matrix = document.getElementById("matrix");
+    var matrix = document.getElementById(label);
 
     // creates a <table> element and a <tmatrix> element
     var tbl = document.createElement("table");
     tbl.setAttribute('id', "tbl");
-    tbl.setAttribute('class', "tbl");
+    tbl.setAttribute('class', "tbl "+ label);
     var tblBody = document.createElement("tbody");
-    for (var i = 0; i <= N+1; i++) {
+
+    var row = document.createElement("tr");
+    row.setAttribute("id", 'r-0');
+    row.setAttribute("class", 'row '+ label +" 0");
+    for(var i=0; i <= R; i++ ) {
+        var cell = document.createElement("td");
+        cell.setAttribute("id", label +'-0-'+i);
+        cell.setAttribute("class", 'cell ' +label +' 0-'+i);
+        cell.style.cssText = 'border: none; background: none';
+        cell.innerHTML = ABC[i-1];
+        row.appendChild(cell);
+    }
+    tblBody.appendChild(row);
+    delete row;
+    for (var i = 1; i <= P; i++) {
         // creates a table row
         var row = document.createElement("tr");
         row.setAttribute("id", 'r-'+i);
-        row.setAttribute("class", 'row '+i);
-        for (var j = 0; j <= W + 1; j++) {
-            var cell = document.createElement("td");
-            cell.setAttribute("id", i+'-'+j);
-            cell.setAttribute("class", 'cell ' + i+'-'+j);
-            var cellText = document.createTextNode('0');
+        row.setAttribute("class", 'row '+ label +" "+i);
 
-            cell.appendChild(cellText);
+        var cell = document.createElement("td");
+        cell.setAttribute("id", label +"-"+i+'-'+j);
+        cell.setAttribute("class", 'cell ' +label +" " + i+'-0');
+        row.appendChild(cell);
+
+        row.appendChild(cell);
+        for (var j = 1; j <= R ; j++) {
+            var cell = document.createElement("td");
+            var input = document.createElement('input');
+            input.id = label + '-' + i + '-' + j;
+            input.type = "text";
+            input.value = arr[i-1][j-1] ?? 0;
+            cell.appendChild(input);
+            cell.setAttribute("id", label +"-"+i+'-'+j);
+            cell.setAttribute("class", 'cell ' +label +" " + i+'- '+j);
+
             row.appendChild(cell);
         }
 
@@ -43,34 +83,28 @@ function createMatrix(){
 // appends <table> into <body>
     matrix.appendChild(tbl);
 
-    for(var i=0; i <= W+1; i++ ) {
-        var get = tblBody.getElementsByClassName('row 0')[0];
-        get = get.getElementsByClassName('cell')[i];
-        get.style.cssText = 'border: none; background: none';
-        get.innerHTML = i-1;
-    }
-    for(var i=0; i <= N+1; i++ ) {
-        var get = tblBody.getElementsByClassName(`row ${i}`)[0];
+    for(var i=0; i <= P; i++ ) {
+        var get = tblBody.getElementsByClassName(`row ${label} ${i}`)[0];
         get = get.getElementsByClassName('cell')[0];
         get.style.cssText = 'border: none; background: none';
-        get.innerHTML = i-1;
+        get.innerHTML = "P" + i;
     }
-    $('#0-0').empty();
+    $(`#${label}-0-0`).empty();
 }
-function createValue(){
-    var tblVal = document.getElementById('val');
+function createAvailable(){
+    var tblVal = document.getElementById('available');
     var tbl = document.createElement("table");
-    tbl.setAttribute('class', "tbl value");
+    tbl.setAttribute('class', "tbl available");
     var tblBody = document.createElement("tbody");
     // creates a table row
     var row = document.createElement("tr");
-    row.setAttribute("id", 'v-r');
+    row.setAttribute("id", 'a-r');
     row.setAttribute("class", 'row');
-    for (var i = 0; i < N; i++) {
+    for (var i = 0; i < R; i++) {
         var cell = document.createElement("td");
-        cell.setAttribute("id", 'v-'+i);
+        cell.setAttribute("id", 'a-'+i);
         cell.setAttribute("class", 'cell');
-        cell.innerHTML = i+1;
+        cell.innerHTML = ABC[i];
 
         row.appendChild(cell);
     }
@@ -78,16 +112,16 @@ function createValue(){
     tblBody.appendChild(row);
     delete row;
     var row = document.createElement("tr");
-    row.setAttribute("id", 'v-r-v');
+    row.setAttribute("id", 'a-r-a');
     row.setAttribute("class", 'row');
-    for (var i = 0; i < N; i++) {
+    for (var i = 0; i < R; i++) {
         var cell = document.createElement("td");
         var input = document.createElement('input');
-        input.id = 'v-i-'+ i;
+        input.id = 'a-i-'+ i;
         input.type = "text";
-        input.value = val[i];
+        input.value = avail[i] ?? 0;
         cell.appendChild(input);
-        cell.setAttribute("id", 'v-c-'+i);
+        cell.setAttribute("id", 'a-c-'+i);
         cell.setAttribute("class", 'cell');
         /*var cellText = document.createTextNode(val[i]);
         cell.appendChild(cellText);*/
@@ -97,8 +131,8 @@ function createValue(){
     tblBody.appendChild(row);
     tbl.appendChild(tblBody);
     tblVal.appendChild(tbl);
-    for(var i=0; i < N; i++ ) {
-        $(`#v-${i}`).css({
+    for(var i=0; i < R; i++ ) {
+        $(`#a-${i}`).css({
             'border': 'none',
             'background': 'none',
         });
@@ -106,206 +140,142 @@ function createValue(){
 
 }
 
-function createWeight(){
-    var tblVal = document.getElementById('wei');
-    var tbl = document.createElement("table");
-    tbl.setAttribute('class', "tbl weight");
-    var tblBody = document.createElement("tbody");
-    // creates a table row
-    var row = document.createElement("tr");
-    row.setAttribute("id", 'w-r');
-    row.setAttribute("class", 'row');
-    for (var i = 0; i < N; i++) {
-        var cell = document.createElement("td");
-        cell.setAttribute("id", 'w-'+i);
-        cell.setAttribute("class", 'cell');
-        cell.innerHTML = i+1;
-        row.appendChild(cell);
+function createNeed(){
+    for(var i = 0; i < P; i++){
+        need[i] = new Array(R);
+        for(var j = 0; j < R; j++){
+            need[i][j] = max[i][j] - allocation[i][j];
+        }
     }
-    // add the row to the end of the table body
-    tblBody.appendChild(row);
-    delete row;
-    var row = document.createElement("tr");
-    row.setAttribute("id", 'w-r-w');
-    row.setAttribute("class", 'row');
-    for (var i = 0; i < N; i++) {
-        var cell = document.createElement("td");
-        var input = document.createElement('input');
-        input.type = "text";
-        input.id = 'w-i-'+ i;
-        input.value = wt[i];
-        cell.appendChild(input);
-        cell.setAttribute("id", 'w-c-'+i);
-        cell.setAttribute("class", 'cell');
-
-        /*var cellText = document.createTextNode(wt[i]);
-        cell.appendChild(cellText);*/
-        row.appendChild(cell);
-    }
-    // add the row to the end of the table body
-    tblBody.appendChild(row);
-    tbl.appendChild(tblBody);
-    tblVal.appendChild(tbl);
-    for(var i=0; i < N; i++ ) {
-        $(`#w-${i}`).css({
-            'border': 'none',
-            'background': 'none',
-        });
-    }
-
+    createMatrix('need', need);
 }
 
-function createTableSelected(){
-    $('.tbl.result').empty();
-    var tbl = document.createElement('tbl');
-    var tblBody = document.createElement('tbody');
-    var row = document.createElement('tr');
-    var cell = document.createElement('td');
-    var text = document.createTextNode('Profit');
-    cell.appendChild(text);
-    row.appendChild(cell);
-    delete cell;
-    delete text;
-    var text = document.createTextNode('Weight');
-    var cell = document.createElement('td');
-    cell.appendChild(text);
-    row.appendChild(cell);
-    tblBody.appendChild(row);
 
-    for (var i=0; i<tracer.selected.length; i++){
-        delete row;
-        delete cell;
-        var row = document.createElement('tr');
-        var cell = document.createElement('td');
-        cell.innerHTML = tracer.selected[i];
-        row.appendChild(cell);
-        delete cell;
-        var cell = document.createElement('td');
-        cell.innerHTML = wt[tracer.selected[i]-1];
-        row.appendChild(cell);
-        tblBody.appendChild(row);
+function banker(){
+    createNeed();
+    tracer.delay();
+    tracer.delay();
+    var f = new Array(P);
+    var ans = new Array(P);
+    var index = 0;
+    for(var i = 0; i < P; i++){
+        f[i] = false;
     }
-    tbl.appendChild(tblBody);
-    document.getElementsByClassName('tbl result')[0].appendChild(tbl);
+    for (var k = 0; k < P; k++) {
+        for (var i = 0; i < P; i++) {
+            if (!f[i]) {
+                tracer.selectRow(i+1, 'max', '#2962ff');
+                tracer.selectRow(i+1, 'allocation', '#2962ff');
+                tracer.selectRow(i+1, 'need', '#2962ff');
+                tracer.delay();
+                var flag = false;
+                for (var j = 0; j < R; j++) {
+                    if (need[i][j] > avail[j]){
+                        flag = true;
+                        break;
+                    }
+                }
+                if (!flag) {
+                    tracer.selectRow(i+1, 'max', '#0b7b12');
+                    tracer.selectRow(i+1, 'allocation', '#0b7b12');
+                    tracer.selectRow(i+1, 'need', '#0b7b12');
+                    tracer.delay();
+                    ans[index++] = i;
+                    for (var j = 0; j < R; j++)
+                        avail[j] += allocation[i][j];
+                    f[i] = true;
+                    tracer.setZero(i+1, 'allocation');
+                    tracer.setZero(i+1, 'need');
+                    tracer.delay();
+
+                    tracer.setValue('a', avail);
+                    tracer.delay();
+                    $('#a-r-a').children('.cell').css('background-color', '#393939');
+                    tracer.delay();
+                }
+                else {
+                    tracer.deSelectRow(i+1, 'max');
+                    tracer.deSelectRow(i+1, 'allocation');
+                    tracer.deSelectRow(i+1, 'need');
+                    tracer.delay();
+                }
+            }
+        }
+    }
+    var result = '';
+    for(var i = 0; i < P-1; i++){
+        result+= 'P' + ans[i] +" -> ";
+    }
+    result+= 'P' + ans[P-1];
+    if(!ans[P-1]) result = "DEADLOCK!!!";
+    $('.output.result').children('p').html('Result: ' + result);
+    tracer.displayCurrent(tracer.hmtlTrace[1]);
+    $('.input-status').val(1);
+    $('.input-status').prop('max', tracer.display.length-1);
+    var width = 1 / (tracer.display.length-1) * 100;
+    $('.status-value').html( 1 + '/' + (tracer.display.length-1) );
+    $('.input-status').css('background', `linear-gradient(270deg, #263238 ${100-width}%, #FFED50 0%)`);
+
 }
 
 function getValue(){
-    N = parseInt($('.input.-N').val());
-    W = parseInt($('.input.-W').val());
-    wt = [];
-    val = [];
-    for(var i = 0; i<N; i++){
-        val.push($(`#v-i-${i}`).val());
-        wt.push($(`#w-i-${i}`).val());
+    R = '';
+    P = '';
+    R = parseInt($('.input.-R').val());
+    P = parseInt($('.input.-P').val());
+
+    getAvail();
+    max = getValueMatrix('max');
+    allocation = getValueMatrix('allocation');
+}
+function getAvail(){
+    avail = new Array(R);
+    for(var i = 0; i < R; i++){
+        avail[i] = parseInt($("#a-i-"+i).val());
+        if(isNaN(avail[i])) avail[i] = 0;
     }
 }
 
-function knapsack(i, j){
-    var temp = i;
-    for (; i < N + 1; i++) {
-        tracer.DP[i] = new Array(W + 1);
-        for (; j < W + 1; j++) {
-            tracer.DP[i][j] = 0;
-        }
-        j=0;
-    }
-i = temp;
-    for ( ;i <= N; i++) {
-        for (; j <= W; j++) {
-            if (i === 0 || j === 0) {
-                /*
-                If we have no items or maximum weight we can take in collection is 0
-                then the total weight in our collection is 0
-                */
-                tracer.DP[i][0] = 0;
-                // visualize {
-                tracer.patch(i, j, tracer.DP[i][j]);
-                tracer.delay();
-                tracer.dePatch(i, j);
-                // }
-            } else if (wt[i - 1] <= j) { // take the current item in our collection
-                // visualize {
-                tracer.selectWaV(i - 1, 1);
-                tracer.selectWaV(i - 1, 0);
-                tracer.delay();
-                tracer.select(i - 1, j - wt[i - 1]);
-                tracer.select(i - 1, j);
-                tracer.delay();
-                // }
-                const A = parseInt(val[i - 1]) + parseInt(tracer.DP[i - 1][j - wt[i - 1]]);
-                const B = parseInt(tracer.DP[i - 1][j]);
-                /*
-                find the maximum of these two values
-                and take which gives us a greater weight
-                 */
-                if (A > B) {
-                    tracer.DP[i][j] = A;
-                    // visualize {
-                    tracer.patch(i, j, tracer.DP[i][j]);
-                    tracer.delay();
-                    // }
-                } else {
-                    tracer.DP[i][j] = B;
-                    // visualize {
-                    tracer.patch(i, j, tracer.DP[i][j]);
-                    tracer.delay();
-                    // }
-                }
-                // visualize {
-                // opt subproblem depatch
-                tracer.dePatch(i, j);
-                tracer.deSelect(i - 1, j);
-                tracer.deSelect(i - 1, j - wt[i - 1]);
-                tracer.deSelectWaV(i - 1, 1);
-                tracer.deSelectWaV(i - 1, 0);
-                // }
-            } else { // leave the current item from our collection
-                tracer.DP[i][j] = tracer.DP[i - 1][j];
-                // visualize {
-                tracer.patch(i, j, tracer.DP[i][j]);
-                tracer.delay();
-                tracer.dePatch(i, j);
-                // }
+function getValueMatrix(type){
+    try {
+        arr = new Array(P);
+        for (var i = 0; i < P; i++) {
+            arr[i] = new Array(R);
+            for (var j = 0; j < R; j++) {
+                arr[i][j] = parseInt($(`#${type}-${i + 1}-${j + 1}`).children('input').val());
+                if(isNaN(arr[i][j])) arr[i][j] = 0;
             }
         }
-        j=0;
+        return arr;
     }
-    i=N; j=W;
-    while(tracer.DP[i][j] != 0){
-        if(tracer.DP[i][j] != tracer.DP[i-1][j]){
-            j-=wt[i-1];
-            tracer.selected.push(i);
-            i--;
-        }
-        else {
-            i--;
-        }
+    catch (e){
+        alert("Input in " + type + " is a number");
     }
-
-    createTableSelected();
-    $('.input-status').prop('max', tracer.display.length-1);
-    $('.status-value').html(1 +'/'+ (tracer.display.length + 1));
-    $('.result-text').html('Result: '+ tracer.DP[N][W]);
-    $('.input-status').val(0);
 }
 
 function clear(){
-    $('.tbl.matrix').empty();
+    $('#max').empty();
+    $('#allocation').empty();
+    $('#need').empty();
+    $('#available').empty();
 
-    $('#val').empty();
-    $('#wei').empty();
+    R = '';
+    P = '';
+    R = parseInt($('.input.-R').val());
+    P = parseInt($('.input.-P').val());
+    createAvailable();
+    createMatrix('max', max);
+    createMatrix('allocation', allocation);
 
-    createValue();
-    createWeight();
     getValue();
-    createMatrix();
 
     tracer.clear();
+    jq();
 
 }
-$('.input.-N').val(N);
-$('.input.-W').val(W);
+$('.input.-R').val(R);
+$('.input.-P').val(P);
 clear();
-knapsack(0,0);
+banker();
 jq();
 
