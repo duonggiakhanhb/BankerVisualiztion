@@ -11,11 +11,13 @@ $('.back').on( 'click', () => {
 $('.forward').on('click', () => {
     if(tracer.pivot==tracer.display.length-1) return;
     changeStatus(1);
+
 });
 
 $('.btn.generate-input').click(() => {
     getAvail();
     clear();
+    createRequest();
 });
 
 $('.btn.generate').click(() => {
@@ -59,6 +61,18 @@ function changeStatus(changed= 0){
     play = true;
     $('.play').html('Play');
 }
+$(document).on('click', '.btn.request', function() {
+    $('.request.modal').css('display', 'block');
+    jq();
+});
+$(document).on('click', '.request.close', function() {
+    $('.request.modal').css('display', 'none');
+    jq();
+});
+$(document).on('click', '.request.add', function() {
+    var get = $('.tbl.request').children('tbody');
+    get.append(createRow('request', get[0].rows.length));
+});
 
 
 

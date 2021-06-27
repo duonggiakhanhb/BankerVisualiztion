@@ -3,6 +3,7 @@ var MAXTIME = Number.MAX_VALUE;
 var P = 5;
 var R = 3;
 var avail = [3, 3, 2];
+var request;
 var max = [
     [7, 5, 3],
     [3, 2, 2],
@@ -150,11 +151,71 @@ function createNeed(){
     createMatrix('need', need);
 }
 
+function createRequest(){
+    $('.request.modal').children('.tbl.request').remove();
+    var matrix = document.getElementsByClassName('request modal');
+
+    // creates a <table> element and a <tmatrix> element
+    var tbl = document.createElement("table");
+    tbl.setAttribute('id', "tbl");
+    tbl.setAttribute('class', "tbl request");
+    var tblBody = document.createElement("tbody");
+
+    var row = document.createElement("tr");
+    row.setAttribute("id", 'r-0');
+    row.setAttribute("class", 'row request' +" 0");
+    for(var i=0; i <= R; i++ ) {
+        var cell = document.createElement("td");
+        cell.setAttribute("id",  'request-0-'+i);
+        cell.setAttribute("class", 'cell request' +' 0-'+i);
+        cell.style.cssText = 'border: none; background: none';
+        cell.innerHTML = ABC[i-1];
+        row.appendChild(cell);
+    }
+    tblBody.appendChild(row);
+    tbl.appendChild(tblBody);
+    matrix[0].insertBefore(tbl, matrix[0].childNodes[2]);
+    $(`#request-0-0`).empty();
+
+}
+function createRow(label, i){
+    var row = document.createElement("tr");
+    row.setAttribute("id", 'r-'+i);
+    row.setAttribute("class", 'row '+ label +" "+i);
+
+
+    for (var j = 0; j <= R ; j++) {
+        var cell = document.createElement("td");
+        var input = document.createElement('input');
+        input.id = label + '-' + i + '-' + j;
+        input.type = "text";
+        input.value = 0;
+        if(j==0){
+            input.value = 'P'+i;
+            cell.style.cssText = 'border: none; background: none';
+        }
+        cell.appendChild(input);
+        cell.setAttribute("id", label + "-" + i + '-' + j);
+        cell.setAttribute("class", 'cell ' + label + " " + i + '- ' + j);
+
+        row.appendChild(cell);
+    }
+    return row;
+}
+
 
 function banker(){
     createNeed();
     tracer.delay();
     tracer.delay();
+    if(getRequest()){
+        if(!runRequest()){
+            var result = 'DEADLOCK!!!';
+            resultDisplay(result);
+            return;
+        }
+    }
+
     var f = new Array(P);
     var ans = new Array(P);
     var index = 0;
@@ -164,6 +225,7 @@ function banker(){
     for (var k = 0; k < P; k++) {
         for (var i = 0; i < P; i++) {
             if (!f[i]) {
+                tracer.deSelectAvailable();
                 tracer.selectRow(i+1, 'max', '#2962ff');
                 tracer.selectRow(i+1, 'allocation', '#2962ff');
                 tracer.selectRow(i+1, 'need', '#2962ff');
@@ -194,6 +256,7 @@ function banker(){
                     tracer.delay();
                 }
                 else {
+                    tracer.deSelectAvailable();
                     tracer.deSelectRow(i+1, 'max');
                     tracer.deSelectRow(i+1, 'allocation');
                     tracer.deSelectRow(i+1, 'need');
@@ -208,6 +271,11 @@ function banker(){
     }
     result+= 'P' + ans[P-1];
     if(!ans[P-1]) result = "DEADLOCK!!!";
+    resultDisplay(result);
+
+}
+
+function resultDisplay(result){
     $('.output.result').children('p').html('Result: ' + result);
     tracer.displayCurrent(tracer.hmtlTrace[1]);
     $('.input-status').val(1);
@@ -218,9 +286,53 @@ function banker(){
 
 }
 
+function runRequest(){
+    for (var i = 0; i < request.length; i++){
+        tracer.selectRow(i+1, 'request', '#d0aa1d')
+        tracer.delay();
+        var p = parseInt(request[i][0].slice(1));
+        var needT = new Array(R);
+        var availT = new Array(R);
+        tracer.selectRow(p, 'need', '#2962ff');
+        tracer.deSelectAvailable();
+        tracer.delay();
+        for (var j = 1; j <= R; j++){
+            tracer.selectRow(p, 'need', '#2962ff');
+            tracer.delay();
+            var num = parseInt(request[i][j]);
+            if(num > need[p-1][j-1]){
+                tracer.selectRow(p, 'need', '#b60018');
+                tracer.delay();
+                tracer.deSelectRow(p, 'need');
+                tracer.delay();
+                return false;
+            }
+            needT[j-1] = need[p-1][j-1] - num;
+
+            if( num > avail[j-1]){
+                tracer.setValue('a', availT, '#b60018');
+                tracer.delay();
+                return false;
+            }
+            availT[j-1] = avail[j-1] - num;
+        }
+        tracer.setValueRow(p, 'need', needT);
+        tracer.selectRow(p, 'need', '#0b7b12');
+        tracer.delay();
+        tracer.setValue('a', availT);
+        tracer.delay();
+        tracer.deSelectRow(p, 'need');
+        tracer.deSelectAvailable();
+        tracer.deSelectRow(i+1, 'request');
+        tracer.delay();
+        need[p-1] = needT;
+        avail = availT;
+    }
+    console.log(need, availT);
+    return true;
+}
+
 function getValue(){
-    R = '';
-    P = '';
     R = parseInt($('.input.-R').val());
     P = parseInt($('.input.-P').val());
 
@@ -234,6 +346,19 @@ function getAvail(){
         avail[i] = parseInt($("#a-i-"+i).val());
         if(isNaN(avail[i])) avail[i] = 0;
     }
+}
+function getRequest(){
+    var get = $('.tbl.request').children('tbody');
+    var length = get[0].rows.length-1;
+    if(length == 0) return false;
+    request = new Array(length)
+    for(var i = 1; i <= length; i++){
+        request[i-1] = new Array(R);
+        for (var j = 0; j <= R; j++){
+            request[i-1][j] = $(`#request-${i}-${j}`).children('input').val();
+        }
+    }
+    return true;
 }
 
 function getValueMatrix(type){
@@ -259,15 +384,15 @@ function clear(){
     $('#need').empty();
     $('#available').empty();
 
-    R = '';
-    P = '';
     R = parseInt($('.input.-R').val());
     P = parseInt($('.input.-P').val());
+
     createAvailable();
     createMatrix('max', max);
     createMatrix('allocation', allocation);
-
     getValue();
+
+
 
     tracer.clear();
     jq();
@@ -276,6 +401,7 @@ function clear(){
 $('.input.-R').val(R);
 $('.input.-P').val(P);
 clear();
+createRequest();
 banker();
 jq();
 

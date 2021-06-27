@@ -4,6 +4,7 @@ function jq() {
         zoomDraggable('.tbl.max');
         zoomDraggable('.tbl.allocation');
         zoomDraggable('.tbl.available');
+        zoomDraggable('.request.modal');
     })
 };
 function zoomDraggable(id){

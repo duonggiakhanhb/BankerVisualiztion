@@ -48,13 +48,25 @@ class Tracer {
             this.state.setZero.push([ i,"'"+ type +"'" ]);
         }
     }
-    setValue(type, arr){
+    setValue(type, arr, color = '#600c86'){
         for(var i = 0; i < R; i++){
             $(`#${type}-i-${i}`).val(arr[i]);
         }
         $('#a-r-a').children('.cell').css('background-color', '#600c86');
         if( typeof this.state.setValue === 'undefined') this.state.setValue = [];
-        this.state.setValue.push(["'"+ type +"'", "["+ arr +"]"]);
+        this.state.setValue.push(["'"+ type +"'", "["+ arr +"]", "'"+ color +"'"]);
+    }
+    deSelectAvailable(){
+        $('#a-r-a').children('.cell').css('background-color', '');
+        if( typeof this.state.setValue === 'undefined') this.state.deSelectAvailable = [];
+        this.state.deSelectAvailable.push(['']);
+    }
+    setValueRow( j, type, arr){
+        for(var i = 1; i <= R; i++){
+            $(`#${type}-${j}-${i}`).children('input').val(arr[i-1]);
+        }
+        if( typeof this.state.setValue === 'undefined') this.state.setValueRow = [];
+        this.state.setValueRow.push([j, "'"+ type +"'", "["+ arr +"]"]);
     }
 
 

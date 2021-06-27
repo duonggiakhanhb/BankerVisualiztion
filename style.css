@@ -99,6 +99,9 @@ body{
 .btn:hover{
     opacity: 80%;
 }
+.btn.request{
+    left: -140px;
+}
 .generate{
     bottom: 0;
 }
@@ -466,4 +469,22 @@ input{
     border: none;
     text-align: center;
     font-size: 18px;
+}
+
+.request.modal{
+    display: none;
+    justify-content: center;
+    width: 300px;
+}
+.request.add:hover{
+    opacity: 80%;
+}
+.request.close{
+    font-size: 24px;
+    color: #bbbbbb;
+    margin: auto;
+    margin-left: 20px;
+}
+.request.close:hover{
+    opacity: 80%;
 }
