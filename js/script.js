@@ -1,5 +1,6 @@
 
 var MAXTIME = Number.MAX_VALUE;
+var error = '';
 var P = 5;
 var R = 3;
 var avail = [3, 3, 2];
@@ -210,7 +211,7 @@ function banker(){
     tracer.delay();
     if(getRequest()){
         if(!runRequest()){
-            var result = 'DEADLOCK!!!';
+            var result = error;
             resultDisplay(result);
             return;
         }
@@ -305,6 +306,7 @@ function runRequest(){
                 tracer.delay();
                 tracer.deSelectRow(p, 'need');
                 tracer.delay();
+                error = "The process has exceeded its maximum claim."
                 return false;
             }
             needT[j-1] = need[p-1][j-1] - num;
@@ -312,6 +314,7 @@ function runRequest(){
             if( num > avail[j-1]){
                 tracer.setValue('a', availT, '#b60018');
                 tracer.delay();
+                error = `P${p} must wait, since the resources are not available.`;
                 return false;
             }
             availT[j-1] = avail[j-1] - num;
